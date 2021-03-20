@@ -4,7 +4,7 @@ import Solver
 import numpy as np
 
 
-filenames = ['C:/Users/marcv/Desktop/Planner test/møder.xlsx', 'C:/Users/marcv/Desktop/Planner test/personer.xlsx', 'C:/Users/marcv/Desktop/Planner test/Unavailability.xlsx']
+filenames = ['C:/Users/Vanman/PycharmProjects/Planner/Planner test/møder.xlsx', 'C:/Users/Vanman/PycharmProjects/Planner/Planner test/personer.xlsx', 'C:/Users/Vanman/PycharmProjects/Planner/Planner test/Unavailability.xlsx']
 
 data_reader = dataReader.dataReader()
 
@@ -19,5 +19,5 @@ def get_date(row):
     return meeting_date
 
 solution['Dato & Tid'] = solution.apply (lambda row: get_date(row), axis=1)
-#solution = solution.drop(['num_meetings', 'days_between', 'Week', 'Day', 'Kvarter'], axis=1)
+solution = solution.drop(['num_meetings', 'days_between', 'Week', 'Day', 'Kvarter'], axis=1)
 print(solution)

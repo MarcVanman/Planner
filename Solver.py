@@ -13,8 +13,8 @@ class Solver:
         #self.weeks_left_of_year = datetime.date(datetime.date.today().isocalendar()[0],12,28).isocalendar()[1] - datetime.date.today().isocalendar()[1]  # According to the same ISO specification, January 4th is always going to be week 1 of a given year. By the same calculation, the 28th of December is then always in the last week of the year
         self.weeks_in_year = 52
         self.days_to_plan = 4    #How many days we have to plan on (including day 0) so 5 days is 4 here
-        self.day_start = 9       #At what time the day starts
-        self.day_end = 17        #At what time the day ends
+        self.day_start = 8       #At what time the day starts
+        self.day_end = 18        #At what time the day ends
         self.time_slots_per_day = (self.day_end-self.day_start)*4  #How many timeslots we have, in quarters after day start until day end.
 
     def Solve(self, data_reader):
@@ -22,17 +22,23 @@ class Solver:
         #Solution shape is (Week from today week, day of the week, time slot of the day)
 
         feasible = False
+        count = 0
         while feasible == False:
+            if count % 100 == 0 :
+                print(count)
+
             sol = self.random_solution(data_reader)
 
             #Check feasibility of solution
             feasible = self.check_feasibility(sol, data_reader)
 
             if feasible == True:
-                print("Solution is feasible!")
+                print(f"{count} solution was chekced before a solution was found")
+                #print("Solution is feasible!")
                 return sol
             else:
-                print("Solution was not feasible")
+                count += 1
+                #print("Solution was not feasible")
 
 
         #return feasible, error
@@ -51,7 +57,7 @@ class Solver:
             id_idx.append(sol.ID.values.searchsorted(id, side='left'))
         # ignore rows with NAN in days between
         for i in range(len(sol)):
-            if sol.days_between.values[i] == np.NAN:
+            if sol.num_meetings.values[i] == 1 or np.isnan(sol.days_between.values[i]):
                 continue
         # If we are at a row where we see an ID for the first time, set the curr_idx to that index
             if i in id_idx:
@@ -73,14 +79,14 @@ class Solver:
             #   Check om mødet starter senere end det må
             if solution.Kvarter.values[i] + solution.duration.values[i]/15 > self.time_slots_per_day:
                 #if solution[i][2]+data_reader.meetings[i].duration/15 > self.time_slots_per_day:
-                print(f"Meeting {i} is placed too late!")
+                #print(f"Meeting {i} is placed too late!")
                 feasible = False
                 return feasible
 
             #   Check om ugen er gyldig
             if solution.Week.values[i]  > self.weeks_in_year:
                 #if solution[i][2]+data_reader.meetings[i].duration/15 > self.time_slots_per_day:
-                print(f"Week of meeting {i} is placed too late!")
+                #print(f"Week of meeting {i} is placed too late!")
                 feasible = False
                 return feasible
 
@@ -101,7 +107,7 @@ class Solver:
 
                         if busy_start < meeting_start < busy_end or busy_start < meeting_end < busy_end:
                             feasible = False
-                            print("Someone in the meeting is busy here")
+                            #print("Someone in the meeting is busy here")
                             return feasible
 
             for j in range(i+1, len(solution)):
@@ -125,7 +131,7 @@ class Solver:
                             #if solution[i][2] + data_reader.meetings[i].duration/15 <= solution[j][2]:
                                 feasible = False
                                 return feasible
-                                print(f"Meeting {i} overlaps meeting {j}")
+                                #print(f"Meeting {i} overlaps meeting {j}")
 
                         #   Hvis møde "j" starter før møde "i"
                         else:
@@ -134,6 +140,6 @@ class Solver:
                             #if solution[j][2] + data_reader.meetings[j].duration/15 >= solution[i][2]:
                                 feasible = False
                                 return feasible
-                                print(f"Meeting {j} overlaps meeting {i}")
+                                #print(f"Meeting {j} overlaps meeting {i}")
 
         return feasible

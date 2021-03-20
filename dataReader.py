@@ -1,8 +1,8 @@
 import pandas as pd
 from collections import defaultdict
 from datetime import datetime, date
-import Meetings
-import Personer
+#import Meetings
+#import Personer
 
 class dataReader:
 
